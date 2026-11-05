@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="LAST EON — Wildland Revolution, esperienza digitale immersiva e open source.">
+  <title>LAST EON — Wildland Revolution</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #080909;
+      --text: #ecece6;
+      --muted: #a4a69e;
+      --line: #ffffff2b;
+      --accent: #c8ff6a;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: radial-gradient(ellipse at 75% 15%, #53683a33, transparent 40%), var(--bg);
+      color: var(--text);
+      font: 16px/1.6 system-ui, sans-serif;
+    }
+    .wrap { width: min(1000px, calc(100% - 36px)); margin: auto; }
+    header { border-bottom: 1px solid var(--line); }
+    nav { min-height: 64px; display: flex; justify-content: space-between; align-items: center; gap: 18px; }
+    nav a { color: var(--muted); text-decoration: none; }
+    .brand { color: var(--text); font-weight: 800; letter-spacing: .14em; }
+    .hero { min-height: 65vh; display: grid; grid-template-columns: 1.2fr .8fr; align-items: center; gap: 28px; padding-block: 70px; }
+    .eyebrow { color: var(--accent); text-transform: uppercase; letter-spacing: .14em; font-size: .75rem; }
+    h1 { font-size: clamp(3.5rem, 11vw, 7rem); line-height: .9; letter-spacing: -.07em; margin: 12px 0; }
+    h2 { font-size: clamp(1.8rem, 5vw, 3rem); line-height: 1.1; }
+    .lead { color: var(--muted); font-size: 1.15rem; }
+    .panel, .card, .stat { border: 1px solid var(--line); background: #ffffff08; border-radius: 14px; padding: 22px; }
+    .cycle { color: var(--accent); }
+    section { padding-block: 55px; border-top: 1px solid var(--line); }
+    .stats, .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 22px; }
+    .stat strong { display: block; font-size: 1.2rem; }
+    .stat span, .card p, .caption { color: var(--muted); }
+    canvas { width: 100%; height: 240px; display: block; border: 1px solid var(--line); border-radius: 12px; }
+    .controls { display: grid; gap: 12px; margin-top: 18px; }
+    .control label { display: flex; justify-content: space-between; }
+    input { width: 100%; accent-color: var(--accent); }
+    footer { padding-block: 28px; color: var(--muted); }
+    @media (max-width: 700px) {
+      .hero { grid-template-columns: 1fr; min-height: auto; }
+      .stats, .cards { grid-template-columns: 1fr; }
+      nav { flex-wrap: wrap; padding-block: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="wrap" aria-label="Navigazione principale">
+      <a class="brand" href="#">LAST EON</a>
+      <div>
+        <a href="#concept">Concept</a> ·
+        <a href="#ricerca">Ricerca</a> ·
+        <a href="#visual">Visualizzazione</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="wrap hero">
+      <div>
+        <p class="eyebrow" id="eyebrow">Esperienza digitale immersiva</p>
+        <h1 id="title">LAST EON</h1>
+        <p class="lead" id="description">Caricamento del progetto…</p>
+      </div>
+      <aside class="panel">
+        <p class="eyebrow">Il ciclo</p>
+        <p class="cycle">STASI → ESTASI → CAOS → DECADIMENTO → STASI</p>
+        <p>One Face · One Race · Free Knowledge</p>
+      </aside>
+    </section>
+
+    <section id="concept">
+      <div class="wrap">
+        <p class="eyebrow">In breve</p>
+        <h2>Un ecosistema in trasformazione.</h2>
+        <div class="stats" id="stats"></div>
+      </div>
+    </section>
+
+    <section id="ricerca">
+      <div class="wrap">
+        <div class="panel">
+          <p class="eyebrow">La ricerca</p>
+          <h2 id="story-title"></h2>
+          <p id="story-text"></p>
+        </div>
+        <div class="cards" id="applications"></div>
+      </div>
+    </section>
+
+    <section id="visual">
+      <div class="wrap">
+        <p class="eyebrow">Visualizzazione dimostrativa</p>
+        <h2>Una curva generativa.</h2>
+        <canvas id="graph" aria-label="Grafico generativo dimostrativo"></canvas>
+        <p class="caption" id="graph-caption"></p>
+        <div class="controls" id="controls"></div>
+        <div class="cards" id="principles"></div>
+        <p id="note-text" class="caption"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap" id="footer"></footer>
+
+  <script>
+    const values = {};
+
+    async function start() {
+      try {
+        const response = await fetch("./project.json");
+        if (!response.ok) throw new Error("project.json non trovato");
+        const data = await response.json();
+
+        document.title = `${data.site.title} — ${data.site.tagline}`;
+        document.getElementById("title").textContent = data.site.title;
+        document.getElementById("eyebrow").textContent = data.hero.eyebrow;
+        document.getElementById("description").textContent = data.hero.description;
+        document.getElementById("story-title").textContent = data.story.title;
+        document.getElementById("story-text").textContent = data.story.text;
+        document.getElementById("graph-caption").textContent = data.graph.caption;
+        document.getElementById("note-text").textContent = data.note.text;
+        document.getElementById("footer").textContent = data.footer;
+
+        data.stats.forEach(item => {
+          const card = document.createElement("article");
+          card.className = "stat";
+          const strong = document.createElement("strong");
+          strong.textContent = item.value;
+          const label = document.createElement("span");
+          label.textContent = item.label;
+          card.append(strong, label);
+          document.getElementById("stats").append(card);
+        });
+
+        data.applications.forEach(item => addCard("applications", item.title, item.text));
+        data.ontology.principles.forEach(item => addCard("principles", item.title, item.text));
+
+        data.controls.forEach(control => {
+          values[control.id] = control.value;
+          const box = document.createElement("div");
+          box.className = "control";
+          const label = document.createElement("label");
+          label.textContent = control.label;
+          const output = document.createElement("span");
+          output.textContent = Number(control.value).toFixed(2);
+          label.append(output);
+
+          const input = document.createElement("input");
+          input.type = "range";
+          input.min = control.min;
+          input.max = control.max;
+          input.step = control.step;
+          input.value = control.value;
+          input.addEventListener("input", () => {
+            values[control.id] = Number(input.value);
+            output.textContent = Number(input.value).toFixed(2);
+            draw();
+          });
+          box.append(label, input);
+          document.getElementById("controls").append(box);
+        });
+
+        draw();
+      } catch (error) {
+        document.querySelector("main").textContent =
+          "Non riesco a caricare project.json. Verifica che il nome sia esatto e che entrambi i file siano nella cartella principale.";
+        console.error(error);
+      }
+    }
+
+    function addCard(containerId, title, text) {
+      const card = document.createElement("article");
+      card.className = "card";
+      const heading = document.createElement("h3");
+      heading.textContent = title;
+      const paragraph = document.createElement("p");
+      paragraph.textContent = text;
+      card.append(heading, paragraph);
+      document.getElementById(containerId).append(card);
+    }
+
+    function draw() {
+      const canvas = document.getElementById("graph");
+      const width = canvas.clientWidth;
+      if (!width) return;
+
+      const ratio = window.devicePixelRatio || 1;
+      canvas.width = width * ratio;
+      canvas.height = 240 * ratio;
+      const ctx = canvas.getContext("2d");
+      ctx.scale(ratio, ratio);
+
+      const intensity = values.intensity ?? 0.62;
+      const frequency = values.frequency ?? 2.4;
+      const constance = values.constance ?? 0.72;
+
+      ctx.clearRect(0, 0, width, 240);
+      ctx.strokeStyle = "#ffffff22";
+      for (let y = 40; y < 240; y += 50) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
+      }
+
+      ctx.beginPath();
+      for (let x = 0; x <= width; x++) {
+        const t = x / width;
+        const wave = Math.sin(t * Math.PI * 2 * frequency) * intensity
+          + Math.sin(t * Math.PI * 5) * constance * 0.3;
+        const y = 120 + wave * 65;
+        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = "#c8ff6a";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    window.addEventListener("resize", draw);
+    start();
+  </script>
+</body>
+</html>
